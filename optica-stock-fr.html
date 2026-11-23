@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Optica Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: sticky top bar with tabs, single content column (max 1240px), tables in scroll containers */
+:root {
+  --bg: #f3f6f8;
+  --surface: #ffffff;
+  --surface-2: #eaf0f3;
+  --fg: #142229;
+  --muted: #5b6d76;
+  --line: #d6e0e5;
+  --accent: #0b6e86;
+  --accent-soft: #d7edf2;
+  --on-accent: #ffffff;
+  --ok: #1e7d4f;
+  --ok-soft: #dcf1e5;
+  --warn: #a5610b;
+  --warn-soft: #fbecd5;
+  --bad: #b3261e;
+  --bad-soft: #f9dedb;
+  --shadow: 0 1px 2px rgba(16, 40, 50, .06), 0 4px 16px rgba(16, 40, 50, .06);
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1518; --surface: #142024; --surface-2: #1b2a30; --fg: #e4edf0; --muted: #93a7af;
+    --line: #26383f; --accent: #4fc0db; --accent-soft: #173a44; --on-accent: #06222a;
+    --ok: #5fd39a; --ok-soft: #173a2a; --warn: #f0b25c; --warn-soft: #3d2d14; --bad: #ff8a80; --bad-soft: #43201d;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1518; --surface: #142024; --surface-2: #1b2a30; --fg: #e4edf0; --muted: #93a7af;
+  --line: #26383f; --accent: #4fc0db; --accent-soft: #173a44; --on-accent: #06222a;
+  --ok: #5fd39a; --ok-soft: #173a2a; --warn: #f0b25c; --warn-soft: #3d2d14; --bad: #ff8a80; --bad-soft: #43201d;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num, td.n, .mono { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-mono); }
+
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.top-inner, main {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top-inner { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+.brand svg { color: var(--accent); }
+.brand small { font-family: var(--font-body); font-weight: 500; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; padding: 2px 6px; border: 1px solid var(--line); border-radius: 4px; }
+nav.tabs { display: flex; gap: 2px; overflow-x: auto; flex: 1 1 auto; min-width: 0; scrollbar-width: none; }
+nav.tabs a {
+  text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 6px; white-space: nowrap; font-weight: 500;
+}
+nav.tabs a:hover { background: var(--surface-2); color: var(--fg); }
+nav.tabs a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.top-actions { display: flex; gap: 8px; }
+
+main { padding-block: 24px 64px; display: grid; gap: 24px; }
+h1 { font-family: var(--font-display); font-size: 26px; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-size: 17px; margin: 0; letter-spacing: -.01em; }
+.page-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.page-head p { margin: 4px 0 0; color: var(--muted); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface);
+  padding: 7px 12px; border-radius: 6px; cursor: pointer; font-weight: 500; white-space: nowrap;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--bad); }
+.btn.sm { padding: 3px 8px; font-size: 12.5px; }
+.btn.ghost { border-color: transparent; background: transparent; }
+.btn.ghost:hover { background: var(--surface-2); }
+
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 4px; }
+.kpi .label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.kpi .value { font-family: var(--font-display); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.kpi .sub { color: var(--muted); font-size: 12.5px; }
+.kpi.alert .value { color: var(--bad); }
+
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.panel-head .hint { color: var(--muted); font-size: 12.5px; }
+.panel-body { padding: 12px 16px; }
+
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.toolbar input[type="search"], .toolbar select, .field input, .field select, .field textarea {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 10px; min-width: 0;
+}
+.toolbar input[type="search"] { flex: 1 1 220px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; background: var(--surface-2); position: sticky; top: 0; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--fg); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr:hover td { background: var(--surface-2); }
+tbody tr:last-child td { border-bottom: 0; }
+.sku { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.strong { font-weight: 600; }
+.muted { color: var(--muted); }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); }
+
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.low { background: var(--warn-soft); color: var(--warn); }
+.pill.out { background: var(--bad-soft); color: var(--bad); }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 12px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.mv-in { color: var(--ok); font-weight: 600; }
+.mv-out { color: var(--bad); font-weight: 600; }
+.mv-adj { color: var(--warn); font-weight: 600; }
+.row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+
+.alert-list { display: grid; }
+.alert-item { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.alert-item:last-child { border-bottom: 0; }
+.alert-item .what { min-width: 0; }
+.alert-item .what div:first-child { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* bar chart */
+.bars { display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 130px 1fr 80px; gap: 10px; align-items: center; font-size: 13px; }
+.bar-track { height: 10px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+.bar-row .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+/* lens products */
+.lens-layout { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.product-list { display: grid; }
+.product {
+  text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 12px 16px; cursor: pointer;
+  display: grid; gap: 4px;
+}
+.product:last-child { border-bottom: 0; }
+.product:hover { background: var(--surface-2); }
+.product[aria-selected="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.product .pname { font-weight: 600; }
+.product .pmeta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12.5px; color: var(--muted); }
+
+.power-grid { border-collapse: separate; border-spacing: 3px; width: auto; margin: 0 auto; }
+.power-grid th, .power-grid td { border: 0; padding: 0; position: static; background: transparent; text-align: center; }
+.power-grid th { font-family: var(--font-mono); font-size: 11.5px; text-transform: none; letter-spacing: 0; padding: 4px 6px; color: var(--muted); }
+.power-grid th.corner { font-family: var(--font-body); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; }
+.power-grid th.row-h { text-align: right; padding-right: 8px; }
+.cell {
+  width: 56px; height: 30px; border-radius: 4px; border: 1px solid transparent; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums;
+  background: var(--ok-soft); color: var(--ok);
+}
+.cell.low { background: var(--warn-soft); color: var(--warn); }
+.cell.out { background: var(--bad-soft); color: var(--bad); }
+.cell.zero-plano { font-weight: 600; }
+.cell:hover { border-color: var(--fg); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+.supplier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.supplier { padding: 16px; display: grid; gap: 8px; }
+.supplier h3 { margin: 0; font-family: var(--font-display); font-size: 16px; }
+.supplier dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+.supplier dt { color: var(--muted); }
+.supplier dd { margin: 0; overflow-wrap: anywhere; }
+
+/* modal */
+.scrim { position: fixed; inset: 0; background: rgba(8, 20, 25, .5); z-index: 20; display: grid; place-items: center; padding: 16px; }
+.modal { background: var(--surface); border-radius: 10px; box-shadow: var(--shadow); width: min(620px, 100%); max-height: calc(100% - 32px); overflow: auto; border: 1px solid var(--line); }
+.modal header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+.modal form { padding: 16px 20px; display: grid; gap: 14px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.form-grid .full { grid-column: 1 / -1; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.field .help { font-size: 12px; color: var(--muted); }
+.modal footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 7px 12px; cursor: pointer; font-weight: 500; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+textarea.csv { width: 100%; height: 220px; font-family: var(--font-mono); font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--surface-2); }
+
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 8px; box-shadow: var(--shadow); font-weight: 500;
+}
+.demo-note { font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 960px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-2, .lens-layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .kpi .value { font-size: 23px; }
+  .bar-row { grid-template-columns: 96px 1fr 64px; }
+  .brand small { display: none; }
+  .top-actions .btn span { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn, .cell, nav.tabs a { transition: background .15s, border-color .15s, filter .15s; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg width="30" height="18" viewBox="0 0 30 18" fill="none" aria-hidden="true">
+        <circle cx="7" cy="10" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>
+        <circle cx="23" cy="10" r="5.5" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M12.5 9.5c1.5-1.4 3.5-1.4 5 0" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M1.5 9 0.5 4M28.5 9l1-5" stroke="currentColor" stroke-width="2" fill="none"/>
+      </svg>
+      Optica Stock <small>Démo</small>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#dashboard" data-view="dashboard">Tableau de bord</a>
+      <a href="#frames" data-view="frames">Montures</a>
+      <a href="#lenses" data-view="lenses">Verres</a>
+      <a href="#movements" data-view="movements">Mouvements</a>
+      <a href="#suppliers" data-view="suppliers">Fournisseurs</a>
+    </nav>
+    <div class="top-actions">
+      <button class="btn primary" id="btn-move" type="button">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span>Mouvement de stock</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="app"></main>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- helpers ---------- */
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const money = (n) => Number(n || 0).toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " €";
+  const money2 = (n) => Number(n || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  const fmtNum = (n) => Number(n || 0).toLocaleString("fr-FR");
+  const pw = (v) => { const n = Number(v); if (n === 0) return "0.00"; return (n > 0 ? "+" : "−") + Math.abs(n).toFixed(2); };
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const today = () => new Date().toISOString();
+  const fmtDate = (iso) => { const d = new Date(iso); return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }) + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); };
+  const key = (s, c) => Number(s).toFixed(2) + "|" + Number(c).toFixed(2);
+
+  const STORE_KEY = "optica-stock-demo-fr-v1";
+  const SPH = []; for (let s = 4; s >= -6; s -= 0.5) SPH.push(Math.round(s * 100) / 100);
+  const CYL = [0, -0.5, -1, -1.5, -2];
+
+  /* ---------- seed data ---------- */
+  function rng(seed) { return () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; }
+
+  function seed() {
+    const r = rng(42);
+    const suppliers = [
+      { id: "s1", name: "Lumen Frames Co.", type: "Montures", contact: "Sara Haddad", phone: "+961 1 555 210", email: "orders@lumenframes.example", lead: 7 },
+      { id: "s2", name: "Northbridge Eyewear", type: "Montures", contact: "Tom Reyes", phone: "+44 20 7946 0811", email: "trade@northbridge.example", lead: 12 },
+      { id: "s3", name: "ClearView Optical Labs", type: "Verres", contact: "Rami Nassar", phone: "+961 3 555 078", email: "lab@clearview.example", lead: 3 },
+      { id: "s4", name: "Prism Lens Supply", type: "Verres", contact: "Anna Kovac", phone: "+49 30 5550 1243", email: "sales@prismlens.example", lead: 5 },
+    ];
+    const frameDefs = [
+      ["Lumen", "Aria", "Écaille", "52-18-140", "Acétate", "Cerclée", "Femme", 62, 165, "s1"],
+      ["Lumen", "Aria", "Noir", "52-18-140", "Acétate", "Cerclée", "Femme", 62, 165, "s1"],
+      ["Lumen", "Kepler", "Gris canon", "54-17-145", "Titane", "Cerclée", "Homme", 88, 240, "s1"],
+      ["Lumen", "Kepler", "Doré", "54-17-145", "Titane", "Cerclée", "Homme", 88, 240, "s1"],
+      ["Lumen", "Nova", "Rose cristal", "48-19-135", "TR90", "Cerclée", "Enfant", 24, 79, "s1"],
+      ["Lumen", "Nova", "Marine", "48-19-135", "TR90", "Cerclée", "Enfant", 24, 79, "s1"],
+      ["Lumen", "Halo", "Argent", "53-18-140", "Acier inoxydable", "Percée", "Mixte", 70, 195, "s1"],
+      ["Lumen", "Orbit", "Noir mat", "50-21-145", "Acétate", "Cerclée", "Mixte", 55, 149, "s1"],
+      ["Lumen", "Orbit", "Miel", "50-21-145", "Acétate", "Cerclée", "Mixte", 55, 149, "s1"],
+      ["Lumen", "Vega", "Or rose", "51-17-140", "Acier inoxydable", "Semi-cerclée", "Femme", 46, 129, "s1"],
+      ["Northbridge", "Camden", "Havane", "53-19-145", "Acétate", "Cerclée", "Homme", 74, 210, "s2"],
+      ["Northbridge", "Camden", "Noir", "53-19-145", "Acétate", "Cerclée", "Homme", 74, 210, "s2"],
+      ["Northbridge", "Elm", "Olive", "49-20-140", "Acétate", "Cerclée", "Mixte", 68, 185, "s2"],
+      ["Northbridge", "Elm", "Gris transparent", "49-20-140", "Acétate", "Cerclée", "Mixte", 68, 185, "s2"],
+      ["Northbridge", "Thames", "Acier brossé", "55-16-145", "Titane", "Semi-cerclée", "Homme", 96, 275, "s2"],
+      ["Northbridge", "Iris", "Bordeaux", "51-18-140", "Acétate", "Papillon", "Femme", 72, 199, "s2"],
+      ["Northbridge", "Iris", "Noir", "51-18-140", "Acétate", "Papillon", "Femme", 72, 199, "s2"],
+      ["Northbridge", "Pip", "Bleu", "45-17-130", "TR90", "Cerclée", "Enfant", 28, 89, "s2"],
+      ["Northbridge", "Pip", "Rouge", "45-17-130", "TR90", "Cerclée", "Enfant", 28, 89, "s2"],
+      ["Northbridge", "Strand", "Doré", "52-19-145", "Titane", "Percée", "Mixte", 110, 320, "s2"],
+      ["Northbridge", "Harbor", "Marine", "56-17-145", "TR90", "Sport", "Homme", 50, 139, "s2"],
+      ["Lumen", "Mira", "Lilas", "50-18-140", "Acétate", "Ronde", "Femme", 58, 159, "s1"],
+      ["Lumen", "Mira", "Écaille", "50-18-140", "Acétate", "Ronde", "Femme", 58, 159, "s1"],
+      ["Lumen", "Atlas", "Gris mat", "57-16-150", "Titane", "Cerclée", "Homme", 92, 260, "s1"],
+    ];
+    const frames = frameDefs.map((d, i) => {
+      const qty = Math.floor(r() * 14);
+      return {
+        id: uid(), sku: "FR-" + String(1001 + i), brand: d[0], model: d[1], color: d[2], size: d[3], material: d[4],
+        rim: d[5], gender: d[6], cost: d[7], price: d[8], supplierId: d[9], reorder: d[6] === "Enfant" ? 4 : 3,
+        qty: i % 7 === 3 ? 0 : i % 5 === 1 ? 2 : qty,
+      };
+    });
+
+    const lensDefs = [
+      ["Unifocal CR-39 durci multicouche", "Unifocal", "1.50", "CR-39", "Durci multicouche", 65, 2, 22, "s3"],
+      ["Unifocal 1.56 filtre lumière bleue", "Unifocal", "1.56", "Indice moyen", "Filtre bleu + antireflet", 70, 2, 34, "s3"],
+      ["Unifocal aminci 1.60 super hydrophobe", "Unifocal", "1.60", "MR-8", "SHMC", 70, 2, 55, "s4"],
+      ["Unifocal extra-fin 1.67", "Unifocal", "1.67", "MR-7", "SHMC", 70, 1, 82, "s4"],
+      ["Unifocal polycarbonate photochromique", "Unifocal", "1.59", "Polycarbonate", "Photochromique gris + antireflet", 70, 2, 68, "s4"],
+    ];
+    const lenses = lensDefs.map((d, i) => {
+      const stock = {};
+      SPH.forEach((s) => CYL.forEach((c) => {
+        const common = Math.abs(s) <= 3 && c >= -1;
+        let q = common ? 4 + Math.floor(r() * 11) : 2 + Math.floor(r() * 6);
+        if (r() < 0.06) q = Math.floor(r() * 3);
+        if (r() < 0.02) q = 0;
+        if (d[2] === "1.67" && Math.abs(s) < 2) q = 1 + Math.floor(r() * 4);
+        stock[key(s, c)] = q;
+      }));
+      return {
+        id: uid(), sku: "LN-" + String(2001 + i), name: d[0], design: d[1], index: d[2], material: d[3], coating: d[4],
+        dia: d[5], reorder: d[6], cost: d[7], price: Math.round(d[7] * 2.6), supplierId: d[8], stock,
+      };
+    });
+
+    const moves = [];
+    const now = Date.now();
+    const notes = ["Vente comptoir", "Ordonnance n°", "Livraison fournisseur", "Casse au détourage", "Correction d'inventaire"];
+    for (let i = 0; i < 18; i++) {
+      const isLens = r() < 0.55;
+      const t = new Date(now - (i * 3.7 + r() * 3) * 3600 * 1000).toISOString();
+      const type = r() < 0.6 ? "sell" : r() < 0.8 ? "receive" : "adjust";
+      const qty = type === "receive" ? 2 + Math.floor(r() * 10) : type === "sell" ? (isLens ? 2 : 1) : -1;
+      if (isLens) {
+        const L = lenses[Math.floor(r() * lenses.length)];
+        const s = SPH[4 + Math.floor(r() * 12)], c = CYL[Math.floor(r() * 3)];
+        moves.push({ id: uid(), at: t, kind: "lens", itemId: L.id, power: key(s, c), type, qty: Math.abs(qty), note: type === "sell" ? notes[1] + (4100 + i) : type === "receive" ? notes[2] : notes[3] });
+      } else {
+        const F = frames[Math.floor(r() * frames.length)];
+        moves.push({ id: uid(), at: t, kind: "frame", itemId: F.id, type, qty: Math.abs(qty), note: type === "sell" ? notes[0] : type === "receive" ? notes[2] : notes[4] });
+      }
+    }
+    return { frames, lenses, suppliers, moves };
+  }
+
+  /* ---------- state ---------- */
+  let db;
+  function load() {
+    try { const raw = localStorage.getItem(STORE_KEY); if (raw) { db = JSON.parse(raw); return; } } catch (e) {}
+    db = seed();
+  }
+  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch (e) {} }
+  load();
+
+  const ui = { view: "dashboard", frameQuery: "", frameFilter: "all", frameStatus: "all", frameSort: "sku", frameDir: 1, lensId: null, moveFilter: "all" };
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY + "-ui") || "{}"); if (s.lensId) ui.lensId = s.lensId; } catch (e) {}
+  const saveUi = () => { try { localStorage.setItem(STORE_KEY + "-ui", JSON.stringify({ lensId: ui.lensId })); } catch (e) {} };
+
+  /* ---------- derived ---------- */
+  const status = (qty, reorder) => (qty <= 0 ? "out" : qty <= reorder ? "low" : "ok");
+  const statusPill = (st) => `<span class="pill ${st}">${st === "ok" ? "En stock" : st === "low" ? "Faible" : "Rupture"}</span>`;
+  const lensTotal = (L) => Object.values(L.stock).reduce((a, b) => a + b, 0);
+  const lensCells = (L) => Object.keys(L.stock).length;
+  const lensLowCells = (L) => Object.values(L.stock).filter((q) => q <= L.reorder).length;
+  const supplierName = (id) => (db.suppliers.find((s) => s.id === id) || {}).name || "—";
+  const frameLabel = (F) => `${F.brand} ${F.model} · ${F.color}`;
+
+  function totals() {
+    const fUnits = db.frames.reduce((a, f) => a + f.qty, 0);
+    const lUnits = db.lenses.reduce((a, l) => a + lensTotal(l), 0);
+    const fVal = db.frames.reduce((a, f) => a + f.qty * f.cost, 0);
+    const lVal = db.lenses.reduce((a, l) => a + lensTotal(l) * l.cost, 0);
+    const lensSkus = db.lenses.reduce((a, l) => a + lensCells(l), 0);
+    const fLow = db.frames.filter((f) => f.qty <= f.reorder);
+    const lLow = [];
+    db.lenses.forEach((l) => Object.entries(l.stock).forEach(([k, q]) => { if (q <= l.reorder) lLow.push({ L: l, k, q }); }));
+    return { fUnits, lUnits, fVal, lVal, lensSkus, fLow, lLow };
+  }
+
+  /* ---------- rendering ---------- */
+  const app = $("#app");
+
+  function render() {
+    $$("nav.tabs a").forEach((a) => { if (a.dataset.view === ui.view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    ({ dashboard: renderDashboard, frames: renderFrames, lenses: renderLenses, movements: renderMovements, suppliers: renderSuppliers }[ui.view] || renderDashboard)();
+  }
+
+  function renderDashboard() {
+    const t = totals();
+    const lowFramesSorted = t.fLow.slice().sort((a, b) => a.qty - b.qty);
+    const lowLensSorted = t.lLow.slice().sort((a, b) => a.q - b.q || Math.abs(parseFloat(a.k)) - Math.abs(parseFloat(b.k)));
+    const brandUnits = {};
+    db.frames.forEach((f) => (brandUnits[f.material] = (brandUnits[f.material] || 0) + f.qty));
+    const lensBy = db.lenses.map((l) => [l.index + " " + l.design, lensTotal(l), l.name]);
+    const matRows = Object.entries(brandUnits).sort((a, b) => b[1] - a[1]);
+    const maxMat = Math.max(1, ...matRows.map((r) => r[1]));
+    const maxLens = Math.max(1, ...lensBy.map((r) => r[1]));
+    const alerts = [
+      ...lowFramesSorted.slice(0, 5).map((f) => `
+        <div class="alert-item">
+          <div class="what"><div>${esc(frameLabel(f))}</div><div class="muted sku">${esc(f.sku)} · ${esc(f.size)}</div></div>
+          ${statusPill(status(f.qty, f.reorder))}
+          <button class="btn sm" data-act="reorder-frame" data-id="${f.id}" type="button">Réceptionner</button>
+        </div>`),
+      ...lowLensSorted.slice(0, 5).map(({ L, k, q }) => {
+        const [s, c] = k.split("|");
+        return `
+        <div class="alert-item">
+          <div class="what"><div>${esc(L.name)}</div><div class="muted mono">SPH ${pw(s)} CYL ${pw(c)} · ${q} pcs</div></div>
+          ${statusPill(status(q, L.reorder))}
+          <button class="btn sm" data-act="reorder-lens" data-id="${L.id}" data-k="${k}" type="button">Réceptionner</button>
+        </div>`;
+      }),
+    ].join("");
+
+    const recent = db.moves.slice().sort((a, b) => b.at.localeCompare(a.at)).slice(0, 8);
+
+    app.innerHTML = `
+      <div class="page-head">
+        <div><h1>Vue d'ensemble du stock</h1><p>Montures et verres de stock du magasin, valorisés au prix d'achat.</p></div>
+        <div class="toolbar"><button class="btn" data-act="export" type="button">Copier le CSV</button><button class="btn ghost" data-act="reset" type="button">Réinitialiser la démo</button></div>
+      </div>
+      <section class="kpis" aria-label="Chiffres clés">
+        <div class="kpi"><span class="label">Articles (références)</span><span class="value">${fmtNum(db.frames.length + t.lensSkus)}</span><span class="sub">${db.frames.length} montures · ${fmtNum(t.lensSkus)} puissances de verres</span></div>
+        <div class="kpi"><span class="label">Unités en stock</span><span class="value">${fmtNum(t.fUnits + t.lUnits)}</span><span class="sub">${fmtNum(t.fUnits)} montures · ${fmtNum(t.lUnits)} verres</span></div>
+        <div class="kpi"><span class="label">Valeur du stock (achat)</span><span class="value">${money(t.fVal + t.lVal)}</span><span class="sub">${money(t.fVal)} montures · ${money(t.lVal)} verres</span></div>
+        <div class="kpi alert"><span class="label">À réapprovisionner</span><span class="value">${fmtNum(t.fLow.length + t.lLow.length)}</span><span class="sub">${t.fLow.length} montures · ${t.lLow.length} puissances de verres</span></div>
+      </section>
+      <div class="grid-2">
+        <section class="panel">
+          <div class="panel-head"><h2>Alertes de réapprovisionnement</h2><span class="hint">Au seuil ou en dessous</span></div>
+          <div class="alert-list">${alerts || `<div class="empty">Tout est au-dessus du seuil de réapprovisionnement.</div>`}</div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Mouvements récents</h2><a class="btn sm ghost" href="#movements">Tout voir</a></div>
+          <div class="table-wrap"><table>
+            <tbody>${recent.map((m) => moveRow(m, true)).join("") || `<tr><td class="empty">Aucun mouvement pour l'instant.</td></tr>`}</tbody>
+          </table></div>
+        </section>
+      </div>
+      <div class="grid-2">
+        <section class="panel">
+          <div class="panel-head"><h2>Verres par produit</h2><span class="hint">Pièces en stock</span></div>
+          <div class="panel-body bars">
+            ${lensBy.map(([lbl, n, name]) => `<div class="bar-row" title="${esc(name)}"><span>${esc(lbl)}</span><div class="bar-track"><div class="bar-fill" style="width:${(n / maxLens) * 100}%"></div></div><span class="n">${fmtNum(n)}</span></div>`).join("")}
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Montures par matériau</h2><span class="hint">Pièces en stock</span></div>
+          <div class="panel-body bars">
+            ${matRows.map(([lbl, n]) => `<div class="bar-row"><span>${esc(lbl)}</span><div class="bar-track"><div class="bar-fill" style="width:${(n / maxMat) * 100}%"></div></div><span class="n">${fmtNum(n)}</span></div>`).join("")}
+          </div>
+        </section>
+      </div>
+      <p class="demo-note">Démo avec des données d'exemple. Les modifications sont enregistrées dans ce navigateur uniquement.</p>`;
+  }
+
+  function moveRow(m, compact) {
+    let item = "Article supprimé", detail = "";
+    if (m.kind === "frame") { const F = db.frames.find((f) => f.id === m.itemId); if (F) { item = frameLabel(F); detail = F.sku; } }
+    else { const L = db.lenses.find((l) => l.id === m.itemId); if (L) { item = L.name; const [s, c] = m.power.split("|"); detail = `SPH ${pw(s)} CYL ${pw(c)}`; } }
+    const cls = m.type === "receive" ? "mv-in" : m.type === "sell" ? "mv-out" : "mv-adj";
+    const sign = m.type === "receive" ? "+" : m.type === "sell" ? "−" : m.qty >= 0 ? "±" : "";
+    const label = m.type === "receive" ? "Réception" : m.type === "sell" ? "Délivrance" : "Ajustement";
+    return `<tr>
+      <td class="muted num">${fmtDate(m.at)}</td>
+      <td><div class="strong">${esc(item)}</div><div class="muted ${m.kind === "lens" ? "mono" : "sku"}" style="font-size:12px">${esc(detail)}</div></td>
+      ${compact ? "" : `<td><span class="tag">${label}</span></td>`}
+      <td class="n ${cls}">${m.type === "adjust" ? "=" + m.qty : sign + m.qty}</td>
+      ${compact ? "" : `<td class="muted">${esc(m.note || "")}</td>`}
+    </tr>`;
+  }
+
+  function renderFrames() {
+    const q = ui.frameQuery.trim().toLowerCase();
+    let rows = db.frames.filter((f) => {
+      if (ui.frameFilter !== "all" && f.gender !== ui.frameFilter) return false;
+      if (ui.frameStatus !== "all" && status(f.qty, f.reorder) !== ui.frameStatus) return false;
+      if (!q) return true;
+      return [f.sku, f.brand, f.model, f.color, f.size, f.material, f.rim].join(" ").toLowerCase().includes(q);
+    });
+    const k = ui.frameSort, d = ui.frameDir;
+    rows.sort((a, b) => (typeof a[k] === "number" ? (a[k] - b[k]) : String(a[k]).localeCompare(String(b[k]))) * d);
+    const th = (key, label, n) => `<th class="sortable ${n ? "n" : ""}" data-sort="${key}" aria-sort="${ui.frameSort === key ? (d > 0 ? "ascending" : "descending") : "none"}">${label}${ui.frameSort === key ? (d > 0 ? " ▲" : " ▼") : ""}</th>`;
+    const units = rows.reduce((a, f) => a + f.qty, 0);
+
+    app.innerHTML = `
+      <div class="page-head">
+        <div><h1>Montures</h1><p>${db.frames.length} références de montures. Taille : calibre–pont–branche en mm.</p></div>
+        <div class="toolbar"><button class="btn primary" data-act="add-frame" type="button">Ajouter une monture</button></div>
+      </div>
+      <section class="panel">
+        <div class="panel-head">
+          <div class="toolbar" style="flex:1">
+            <input type="search" id="frame-q" placeholder="Rechercher marque, modèle, couleur, taille…" value="${esc(ui.frameQuery)}" aria-label="Rechercher des montures">
+            <select id="frame-g" aria-label="Filtrer par catégorie">
+              ${["all", "Homme", "Femme", "Mixte", "Enfant"].map((g) => `<option value="${g}" ${ui.frameFilter === g ? "selected" : ""}>${g === "all" ? "Toutes catégories" : g}</option>`).join("")}
+            </select>
+            <select id="frame-s" aria-label="Filtrer par état du stock">
+              ${[["all", "Tous états"], ["ok", "En stock"], ["low", "Faible"], ["out", "En rupture"]].map(([v, l]) => `<option value="${v}" ${ui.frameStatus === v ? "selected" : ""}>${l}</option>`).join("")}
+            </select>
+          </div>
+          <span class="hint">${rows.length} affichées · ${fmtNum(units)} unités</span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr>
+            ${th("sku", "Réf.")}${th("brand", "Marque / modèle")}${th("size", "Taille")}${th("material", "Matériau")}${th("rim", "Style")}${th("gender", "Catégorie")}
+            ${th("qty", "Qté", 1)}${th("cost", "Achat", 1)}${th("price", "Vente", 1)}<th>État</th><th class="n">Actions</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map((f) => `<tr>
+              <td class="sku">${esc(f.sku)}</td>
+              <td><div class="strong">${esc(f.brand)} ${esc(f.model)}</div><div class="muted" style="font-size:12px">${esc(f.color)}</div></td>
+              <td class="mono">${esc(f.size)}</td>
+              <td>${esc(f.material)}</td>
+              <td>${esc(f.rim)}</td>
+              <td><span class="tag">${esc(f.gender)}</span></td>
+              <td class="n strong">${f.qty}</td>
+              <td class="n">${money2(f.cost)}</td>
+              <td class="n">${money2(f.price)}</td>
+              <td>${statusPill(status(f.qty, f.reorder))}</td>
+              <td><div class="row-actions">
+                <button class="btn sm" data-act="sell-frame" data-id="${f.id}" type="button" ${f.qty <= 0 ? "disabled" : ""}>Vendre</button>
+                <button class="btn sm" data-act="reorder-frame" data-id="${f.id}" type="button">Réceptionner</button>
+                <button class="btn sm ghost" data-act="edit-frame" data-id="${f.id}" type="button">Modifier</button>
+              </div></td>
+            </tr>`).join("") || `<tr><td colspan="11" class="empty">Aucune monture ne correspond à ces filtres.</td></tr>`}
+          </tbody>
+        </table></div>
+      </section>`;
+
+    const qi = $("#frame-q");
+    qi.addEventListener("input", (e) => { ui.frameQuery = e.target.value; const pos = e.target.selectionStart; renderFrames(); const n = $("#frame-q"); n.focus(); n.setSelectionRange(pos, pos); });
+    $("#frame-g").addEventListener("change", (e) => { ui.frameFilter = e.target.value; renderFrames(); });
+    $("#frame-s").addEventListener("change", (e) => { ui.frameStatus = e.target.value; renderFrames(); });
+    $$("th.sortable").forEach((h) => h.addEventListener("click", () => { const k = h.dataset.sort; if (ui.frameSort === k) ui.frameDir *= -1; else { ui.frameSort = k; ui.frameDir = 1; } renderFrames(); }));
+  }
+
+  function renderLenses() {
+    if (!db.lenses.find((l) => l.id === ui.lensId)) ui.lensId = db.lenses[0] && db.lenses[0].id;
+    const L = db.lenses.find((l) => l.id === ui.lensId);
+    const list = db.lenses.map((l) => {
+      const low = lensLowCells(l);
+      return `<button class="product" role="option" aria-selected="${l.id === ui.lensId}" data-act="pick-lens" data-id="${l.id}" type="button">
+        <span class="pname">${esc(l.name)}</span>
+        <span class="pmeta"><span class="tag">n = ${esc(l.index)}</span><span>${esc(l.coating)}</span></span>
+        <span class="pmeta"><span>${fmtNum(lensTotal(l))} pcs</span>·<span style="color:${low ? "var(--warn)" : "var(--ok)"}">${low} puissances faibles</span></span>
+      </button>`;
+    }).join("");
+
+    let grid = `<div class="empty">Ajoutez un produit verre pour voir sa grille de puissances.</div>`;
+    if (L) {
+      grid = `
+        <div class="panel-head">
+          <div><h2>${esc(L.name)}</h2><div class="hint">${esc(L.sku)} · ${esc(L.design)} · ${esc(L.material)} n=${esc(L.index)} · Ø${L.dia} mm · ${esc(supplierName(L.supplierId))}</div></div>
+          <div class="toolbar">
+            <button class="btn sm ghost" data-act="edit-lens" data-id="${L.id}" type="button">Modifier le produit</button>
+          </div>
+        </div>
+        <div class="panel-body" style="display:grid;gap:12px">
+          <div class="legend">
+            <span><i style="background:var(--ok-soft);border:1px solid var(--ok)"></i>Au-dessus du seuil (${L.reorder})</span>
+            <span><i style="background:var(--warn-soft);border:1px solid var(--warn)"></i>Faible</span>
+            <span><i style="background:var(--bad-soft);border:1px solid var(--bad)"></i>Rupture</span>
+            <span>Pièces par puissance. Sélectionnez une case pour réceptionner ou délivrer.</span>
+          </div>
+          <div class="table-wrap">
+            <table class="power-grid" aria-label="Stock par sphère et cylindre">
+              <thead><tr><th class="corner">SPH \\ CYL</th>${CYL.map((c) => `<th>${pw(c)}</th>`).join("")}</tr></thead>
+              <tbody>${SPH.map((s) => `<tr><th class="row-h" scope="row">${pw(s)}</th>${CYL.map((c) => {
+                const k = key(s, c), qv = L.stock[k] ?? 0, st = status(qv, L.reorder);
+                return `<td><button class="cell ${st === "ok" ? "" : st}" data-act="cell" data-k="${k}" type="button" aria-label="SPH ${pw(s)} CYL ${pw(c)}: ${qv} pièces">${qv}</button></td>`;
+              }).join("")}</tr>`).join("")}</tbody>
+            </table>
+          </div>
+          <div class="toolbar muted" style="justify-content:space-between">
+            <span>${fmtNum(lensTotal(L))} pcs en stock · ${lensLowCells(L)} sur ${lensCells(L)} puissances au seuil ou en dessous</span>
+            <span>Achat ${money2(L.cost)} · Vente ${money2(L.price)} par verre</span>
+          </div>
+        </div>`;
+    }
+
+    app.innerHTML = `
+      <div class="page-head">
+        <div><h1>Verres</h1><p>Verres de stock par produit, suivis par puissance sphère / cylindre.</p></div>
+        <div class="toolbar"><button class="btn primary" data-act="add-lens" type="button">Ajouter un produit verre</button></div>
+      </div>
+      <div class="lens-layout">
+        <section class="panel"><div class="panel-head"><h2>Produits</h2><span class="hint">${db.lenses.length}</span></div><div class="product-list" role="listbox" aria-label="Produits verres">${list}</div></section>
+        <section class="panel">${grid}</section>
+      </div>`;
+  }
+
+  function renderMovements() {
+    const rows = db.moves.filter((m) => ui.moveFilter === "all" || m.type === ui.moveFilter).sort((a, b) => b.at.localeCompare(a.at));
+    app.innerHTML = `
+      <div class="page-head">
+        <div><h1>Mouvements de stock</h1><p>Chaque livraison, délivrance et correction d'inventaire.</p></div>
+        <div class="toolbar"><button class="btn primary" data-act="new-move" type="button">Enregistrer un mouvement</button></div>
+      </div>
+      <section class="panel">
+        <div class="panel-head">
+          <div class="seg" role="group" aria-label="Filtrer les mouvements">
+            ${[["all", "Tous"], ["receive", "Réception"], ["sell", "Délivrance"], ["adjust", "Ajustement"]].map(([v, l]) => `<button type="button" data-mf="${v}" aria-pressed="${ui.moveFilter === v}">${l}</button>`).join("")}
+          </div>
+          <span class="hint">${rows.length} entrées</span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date</th><th>Article</th><th>Type</th><th class="n">Qté</th><th>Note</th></tr></thead>
+          <tbody>${rows.map(moveRow).join("") || `<tr><td colspan="5" class="empty">Aucun mouvement de ce type.</td></tr>`}</tbody>
+        </table></div>
+      </section>`;
+    $$("[data-mf]").forEach((b) => b.addEventListener("click", () => { ui.moveFilter = b.dataset.mf; renderMovements(); }));
+  }
+
+  function renderSuppliers() {
+    app.innerHTML = `
+      <div class="page-head">
+        <div><h1>Fournisseurs</h1><p>Vos fournisseurs de montures et de verres.</p></div>
+        <div class="toolbar"><button class="btn primary" data-act="add-supplier" type="button">Ajouter un fournisseur</button></div>
+      </div>
+      <div class="supplier-grid">
+        ${db.suppliers.map((s) => {
+          const nf = db.frames.filter((f) => f.supplierId === s.id).length;
+          const nl = db.lenses.filter((l) => l.supplierId === s.id).length;
+          return `<section class="panel supplier">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:start"><h3>${esc(s.name)}</h3><span class="tag">${esc(s.type)}</span></div>
+            <dl>
+              <dt>Contact</dt><dd>${esc(s.contact)}</dd>
+              <dt>Téléphone</dt><dd class="mono">${esc(s.phone)}</dd>
+              <dt>E-mail</dt><dd class="mono">${esc(s.email)}</dd>
+              <dt>Délai</dt><dd>${esc(s.lead)} jours</dd>
+              <dt>Fournit</dt><dd>${nf ? nf + " montures" : ""}${nf && nl ? " · " : ""}${nl ? nl + " produits verres" : ""}${!nf && !nl ? "Aucun article lié" : ""}</dd>
+            </dl>
+            <div><button class="btn sm ghost" data-act="edit-supplier" data-id="${s.id}" type="button">Modifier</button></div>
+          </section>`;
+        }).join("")}
+      </div>`;
+  }
+
+  /* ---------- modal & toast ---------- */
+  const modalRoot = $("#modal-root");
+  function openModal(title, bodyHtml, onSubmit, opts = {}) {
+    modalRoot.innerHTML = `<div class="scrim"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+      <header><h2 id="m-title">${esc(title)}</h2><button class="btn ghost sm" data-close type="button" aria-label="Fermer">✕</button></header>
+      <form id="m-form" novalidate>${bodyHtml}
+        <footer>
+          ${opts.danger ? `<button class="btn danger" type="button" id="m-danger" style="margin-right:auto">${esc(opts.danger)}</button>` : ""}
+          <button class="btn" type="button" data-close>Annuler</button>
+          ${opts.noSubmit ? "" : `<button class="btn primary" type="submit">${esc(opts.submit || "Enregistrer")}</button>`}
+        </footer>
+      </form></div></div>`;
+    const scrim = $(".scrim", modalRoot);
+    scrim.addEventListener("mousedown", (e) => { if (e.target === scrim) closeModal(); });
+    $$("[data-close]", modalRoot).forEach((b) => b.addEventListener("click", closeModal));
+    $("#m-form").addEventListener("submit", (e) => { e.preventDefault(); const fd = Object.fromEntries(new FormData(e.target).entries()); if (onSubmit(fd, e.target) !== false) closeModal(); });
+    if (opts.danger) {
+      const b = $("#m-danger"); let armed = false;
+      b.addEventListener("click", () => { if (!armed) { armed = true; b.textContent = "Cliquer à nouveau pour confirmer"; return; } opts.onDanger(); closeModal(); });
+    }
+    if (opts.onOpen) opts.onOpen();
+    const first = $("input, select, textarea", modalRoot); if (first) first.focus();
+  }
+  function closeModal() { modalRoot.innerHTML = ""; }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modalRoot.innerHTML) closeModal(); });
+
+  let toastTimer;
+  function toast(msg) {
+    const root = $("#toast-root");
+    root.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (root.innerHTML = ""), 2600);
+  }
+
+  const field = (name, label, value, type = "text", extra = "") => `<div class="field ${extra.includes("full") ? "full" : ""}"><label for="f-${name}">${label}</label><input id="f-${name}" name="${name}" type="${type}" value="${esc(value)}" ${type === "number" ? 'step="any"' : ""} ${extra.replace("full", "")}></div>`;
+  const select = (name, label, value, options, extra = "") => `<div class="field ${extra}"><label for="f-${name}">${label}</label><select id="f-${name}" name="${name}">${options.map((o) => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}" ${String(v) === String(value) ? "selected" : ""}>${esc(l)}</option>`; }).join("")}</select></div>`;
+  const supplierOpts = (type) => db.suppliers.filter((s) => !type || s.type === type).map((s) => [s.id, s.name]);
+
+  /* ---------- frame forms ---------- */
+  function frameForm(F) {
+    const isNew = !F;
+    F = F || { sku: "FR-" + (1001 + db.frames.length + Math.floor(Math.random() * 90)), brand: "", model: "", color: "", size: "52-18-140", material: "Acétate", rim: "Cerclée", gender: "Mixte", qty: 0, reorder: 3, cost: 0, price: 0, supplierId: "s1" };
+    openModal(isNew ? "Ajouter une monture" : "Modifier la monture", `
+      <div class="form-grid">
+        ${field("sku", "Référence", F.sku, "text", "required")}
+        ${field("brand", "Marque", F.brand, "text", "required")}
+        ${field("model", "Modèle", F.model, "text", "required")}
+        ${field("color", "Couleur", F.color)}
+        <div class="field"><label for="f-size">Taille (calibre–pont–branche)</label><input id="f-size" name="size" value="${esc(F.size)}" pattern="\\d{2}-\\d{2}-\\d{3}" placeholder="52-18-140"><span class="help">mm, ex. 52-18-140</span></div>
+        ${select("material", "Matériau", F.material, ["Acétate", "Titane", "Acier inoxydable", "TR90", "Aluminium", "Bois"])}
+        ${select("rim", "Style", F.rim, ["Cerclée", "Semi-cerclée", "Percée", "Papillon", "Ronde", "Sport"])}
+        ${select("gender", "Catégorie", F.gender, ["Homme", "Femme", "Mixte", "Enfant"])}
+        ${field("qty", "Quantité en stock", F.qty, "number", 'min="0"')}
+        ${field("reorder", "Seuil de réapprovisionnement", F.reorder, "number", 'min="0"')}
+        ${field("cost", "Prix d'achat", F.cost, "number", 'min="0"')}
+        ${field("price", "Prix de vente", F.price, "number", 'min="0"')}
+        ${select("supplierId", "Fournisseur", F.supplierId, supplierOpts("Montures"), "full")}
+      </div>`,
+      (d) => {
+        if (!d.brand.trim() || !d.model.trim()) { toast("Saisissez une marque et un modèle pour enregistrer cette monture."); return false; }
+        const rec = { ...d, qty: Math.max(0, parseInt(d.qty) || 0), reorder: Math.max(0, parseInt(d.reorder) || 0), cost: +d.cost || 0, price: +d.price || 0 };
+        if (isNew) { db.frames.push({ id: uid(), ...rec }); toast(`Ajouté : ${rec.brand} ${rec.model}`); }
+        else { Object.assign(F, rec); toast("Monture enregistrée"); }
+        save(); render();
+      },
+      isNew ? { submit: "Ajouter une monture" } : { danger: "Supprimer la monture", onDanger: () => { db.frames = db.frames.filter((f) => f !== F); save(); render(); toast("Monture supprimée"); } });
+  }
+
+  /* ---------- lens forms ---------- */
+  function lensForm(L) {
+    const isNew = !L;
+    const base = L || { sku: "LN-" + (2001 + db.lenses.length), name: "", design: "Unifocal", index: "1.56", material: "Indice moyen", coating: "Durci multicouche", dia: 70, reorder: 4, cost: 0, price: 0, supplierId: "s3" };
+    openModal(isNew ? "Ajouter un produit verre" : "Modifier le produit verre", `
+      <div class="form-grid">
+        ${field("name", "Nom du produit", base.name, "text", "required full")}
+        ${field("sku", "Référence", base.sku)}
+        ${select("design", "Géométrie", base.design, ["Unifocal", "Bifocal", "Progressif", "Mi-distance / dégressif"])}
+        ${select("index", "Indice de réfraction", base.index, ["1.50", "1.53", "1.56", "1.59", "1.60", "1.67", "1.74"])}
+        ${select("material", "Matériau", base.material, ["CR-39", "Indice moyen", "Polycarbonate", "Trivex", "MR-8", "MR-7", "MR-174"])}
+        ${field("coating", "Traitement", base.coating, "text", "full")}
+        ${field("dia", "Diamètre (mm)", base.dia, "number")}
+        ${field("reorder", "Seuil par puissance", base.reorder, "number", 'min="0"')}
+        ${field("cost", "Achat par verre", base.cost, "number")}
+        ${field("price", "Vente par verre", base.price, "number")}
+        ${select("supplierId", "Fournisseur", base.supplierId, supplierOpts("Verres"), "full")}
+        ${isNew ? `<div class="field full"><label for="f-init">Quantité initiale par puissance</label><input id="f-init" name="init" type="number" value="0" min="0"><span class="help">Crée SPH +4.00 à −6.00 × CYL 0.00 à −2.00 par pas de 0.50 (${SPH.length * CYL.length} puissances).</span></div>` : ""}
+      </div>`,
+      (d) => {
+        if (!d.name.trim()) { toast("Saisissez un nom de produit pour enregistrer ce verre."); return false; }
+        const rec = { name: d.name, sku: d.sku, design: d.design, index: d.index, material: d.material, coating: d.coating, dia: +d.dia || 70, reorder: Math.max(0, parseInt(d.reorder) || 0), cost: +d.cost || 0, price: +d.price || 0, supplierId: d.supplierId };
+        if (isNew) {
+          const stock = {}; const init = Math.max(0, parseInt(d.init) || 0);
+          SPH.forEach((s) => CYL.forEach((c) => (stock[key(s, c)] = init)));
+          const nl = { id: uid(), ...rec, stock }; db.lenses.push(nl); ui.lensId = nl.id; saveUi(); toast(`Ajouté : ${rec.name}`);
+        } else { Object.assign(L, rec); toast("Produit verre enregistré"); }
+        save(); render();
+      },
+      isNew ? { submit: "Ajouter le produit" } : { danger: "Supprimer le produit", onDanger: () => { db.lenses = db.lenses.filter((l) => l !== L); save(); render(); toast("Produit verre supprimé"); } });
+  }
+
+  /* ---------- supplier form ---------- */
+  function supplierForm(S) {
+    const isNew = !S;
+    const b = S || { name: "", type: "Montures", contact: "", phone: "", email: "", lead: 7 };
+    openModal(isNew ? "Ajouter un fournisseur" : "Modifier le fournisseur", `
+      <div class="form-grid">
+        ${field("name", "Société", b.name, "text", "full")}
+        ${select("type", "Fournit", b.type, ["Montures", "Verres", "Accessoires"])}
+        ${field("lead", "Délai (jours)", b.lead, "number")}
+        ${field("contact", "Contact", b.contact)}
+        ${field("phone", "Téléphone", b.phone)}
+        ${field("email", "E-mail", b.email, "email", "full")}
+      </div>`,
+      (d) => {
+        if (!d.name.trim()) { toast("Saisissez un nom de société."); return false; }
+        const rec = { ...d, lead: parseInt(d.lead) || 0 };
+        if (isNew) db.suppliers.push({ id: uid(), ...rec }); else Object.assign(S, rec);
+        save(); render(); toast(isNew ? "Fournisseur ajouté" : "Fournisseur enregistré");
+      }, isNew ? { submit: "Ajouter un fournisseur" } : {});
+  }
+
+  /* ---------- movement form ---------- */
+  function moveForm(pre = {}) {
+    let kind = pre.kind || "frame";
+    let type = pre.type || "sell";
+    const body = () => {
+      const itemOpts = kind === "frame" ? db.frames.map((f) => [f.id, `${f.sku} · ${frameLabel(f)} (${f.qty})`]) : db.lenses.map((l) => [l.id, `${l.sku} · ${l.name}`]);
+      const itemId = pre.itemId || (itemOpts[0] && itemOpts[0][0]);
+      return `
+        <div class="toolbar" style="justify-content:space-between">
+          <div class="seg" role="group" aria-label="Type d'article">
+            <button type="button" data-kind="frame" aria-pressed="${kind === "frame"}">Monture</button>
+            <button type="button" data-kind="lens" aria-pressed="${kind === "lens"}">Verre</button>
+          </div>
+          <div class="seg" role="group" aria-label="Type de mouvement">
+            <button type="button" data-type="receive" aria-pressed="${type === "receive"}">Réceptionner</button>
+            <button type="button" data-type="sell" aria-pressed="${type === "sell"}">Délivrer</button>
+            <button type="button" data-type="adjust" aria-pressed="${type === "adjust"}">Inventaire</button>
+          </div>
+        </div>
+        <div class="form-grid">
+          ${select("itemId", kind === "frame" ? "Monture" : "Produit verre", itemId, itemOpts, "full")}
+          ${kind === "lens" ? select("sph", "Sphère (SPH)", pre.sph ?? "-1", SPH.map((s) => [s, pw(s)])) + select("cyl", "Cylindre (CYL)", pre.cyl ?? "0", CYL.map((c) => [c, pw(c)])) : ""}
+          <div class="field"><label for="f-qty">${type === "adjust" ? "Quantité comptée" : "Quantité"}</label><input id="f-qty" name="qty" type="number" min="0" value="${type === "adjust" ? "" : kind === "lens" && type === "sell" ? 2 : 1}" required></div>
+          <div class="field"><label>En stock actuellement</label><div id="onhand" class="strong" style="padding:7px 0"></div></div>
+          ${field("note", "Note", type === "sell" ? (kind === "lens" ? "Ordonnance n°" : "Vente comptoir") : type === "receive" ? "Livraison fournisseur" : "Inventaire", "text", "full")}
+        </div>`;
+    };
+    const mount = () => {
+      openModal("Enregistrer un mouvement de stock", body(), submit, { submit: "Enregistrer", onOpen: wire });
+    };
+    function current() {
+      const f = $("#m-form"); const id = f.itemId.value;
+      if (kind === "frame") { const F = db.frames.find((x) => x.id === id); return F ? F.qty : 0; }
+      const L = db.lenses.find((x) => x.id === id); return L ? (L.stock[key(f.sph.value, f.cyl.value)] ?? 0) : 0;
+    }
+    function wire() {
+      $$("[data-kind]", modalRoot).forEach((b) => b.addEventListener("click", () => { kind = b.dataset.kind; pre = { kind }; mount(); }));
+      $$("[data-type]", modalRoot).forEach((b) => b.addEventListener("click", () => { const f = $("#m-form"); type = b.dataset.type; pre = { ...pre, kind, itemId: f.itemId.value, sph: f.sph && f.sph.value, cyl: f.cyl && f.cyl.value }; mount(); }));
+      const upd = () => ($("#onhand").textContent = current() + " pcs");
+      $$("#m-form select").forEach((s) => s.addEventListener("change", upd)); upd();
+    }
+    function submit(d) {
+      const qty = parseInt(d.qty);
+      if (isNaN(qty) || qty < 0 || (type !== "adjust" && qty === 0)) { toast("Saisissez une quantité d'au moins 1."); return false; }
+      const have = current();
+      if (type === "sell" && qty > have) { toast(`Seulement ${have} en stock. Réduisez la quantité ou réceptionnez d'abord du stock.`); return false; }
+      const m = { id: uid(), at: today(), kind, itemId: d.itemId, type, qty, note: d.note };
+      if (kind === "frame") {
+        const F = db.frames.find((x) => x.id === d.itemId);
+        F.qty = type === "receive" ? F.qty + qty : type === "sell" ? F.qty - qty : qty;
+        toast(`${frameLabel(F)} : désormais ${F.qty} pcs`);
+      } else {
+        const L = db.lenses.find((x) => x.id === d.itemId); const k = key(d.sph, d.cyl); m.power = k;
+        const cur = L.stock[k] ?? 0;
+        L.stock[k] = type === "receive" ? cur + qty : type === "sell" ? cur - qty : qty;
+        toast(`${L.name} ${pw(d.sph)} / ${pw(d.cyl)} : désormais ${L.stock[k]} pcs`);
+      }
+      db.moves.push(m); save(); render();
+    }
+    mount();
+  }
+
+  /* ---------- CSV ---------- */
+  function exportCsv() {
+    const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
+    const lines = [["categorie", "reference", "description", "puissance", "qte", "seuil", "achat", "vente", "fournisseur"].join(";")];
+    db.frames.forEach((f) => lines.push(["monture", f.sku, `${frameLabel(f)} ${f.size}`, "", f.qty, f.reorder, f.cost, f.price, supplierName(f.supplierId)].map(q).join(";")));
+    db.lenses.forEach((l) => Object.entries(l.stock).forEach(([k, n]) => { const [s, c] = k.split("|"); lines.push(["verre", l.sku, l.name, `SPH ${pw(s)} CYL ${pw(c)}`.replace("−", "-").replace("−", "-"), n, l.reorder, l.cost, l.price, supplierName(l.supplierId)].map(q).join(";")); }));
+    const csv = lines.join("\n");
+    openModal("Export du stock (CSV)", `<p class="muted" style="margin:0">${lines.length - 1} lignes. Copiez-les et collez-les dans Excel ou Google Sheets.</p><textarea class="csv" id="csv-out" readonly aria-label="Données CSV">${esc(csv)}</textarea>
+      <div><button class="btn primary" type="button" id="copy-csv">Copier dans le presse-papiers</button></div>`, () => {}, { noSubmit: true, onOpen: () => {
+        $("#copy-csv").addEventListener("click", () => {
+          const ta = $("#csv-out");
+          const fallback = () => { ta.focus(); ta.select(); toast("Texte sélectionné. Appuyez sur Ctrl+C / ⌘C pour copier."); };
+          try { navigator.clipboard.writeText(csv).then(() => toast("CSV copié"), fallback); } catch (e) { fallback(); }
+        });
+      } });
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-act]"); if (!t) return;
+    const id = t.dataset.id, act = t.dataset.act;
+    if (act === "add-frame") frameForm();
+    else if (act === "edit-frame") frameForm(db.frames.find((f) => f.id === id));
+    else if (act === "sell-frame") moveForm({ kind: "frame", type: "sell", itemId: id });
+    else if (act === "reorder-frame") moveForm({ kind: "frame", type: "receive", itemId: id });
+    else if (act === "add-lens") lensForm();
+    else if (act === "edit-lens") lensForm(db.lenses.find((l) => l.id === id));
+    else if (act === "pick-lens") { ui.lensId = id; saveUi(); renderLenses(); }
+    else if (act === "cell") { const [s, c] = t.dataset.k.split("|"); moveForm({ kind: "lens", type: "sell", itemId: ui.lensId, sph: String(+s), cyl: String(+c) }); }
+    else if (act === "reorder-lens") { const [s, c] = t.dataset.k.split("|"); moveForm({ kind: "lens", type: "receive", itemId: id, sph: String(+s), cyl: String(+c) }); }
+    else if (act === "new-move") moveForm();
+    else if (act === "add-supplier") supplierForm();
+    else if (act === "edit-supplier") supplierForm(db.suppliers.find((s) => s.id === id));
+    else if (act === "export") exportCsv();
+    else if (act === "reset") {
+      if (t.dataset.armed) { db = seed(); save(); ui.lensId = null; render(); toast("Données de démo restaurées"); }
+      else { t.dataset.armed = "1"; t.textContent = "Cliquer à nouveau pour confirmer"; setTimeout(() => { if (t.isConnected) { delete t.dataset.armed; t.textContent = "Réinitialiser la démo"; } }, 3000); }
+    }
+  });
+  $("#btn-move").addEventListener("click", () => moveForm());
+
+  const VIEWS = ["dashboard", "frames", "lenses", "movements", "suppliers"];
+  function route() { const h = location.hash.slice(1); ui.view = VIEWS.includes(h) ? h : "dashboard"; render(); window.scrollTo(0, 0); }
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+
+</body>
+</html>

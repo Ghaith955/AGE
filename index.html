@@ -485,7 +485,7 @@ textarea.csv { width: 100%; height: 220px; font-family: var(--font-mono); font-s
     return `<tr>
       <td class="muted num">${fmtDate(m.at)}</td>
       <td><div class="strong">${esc(item)}</div><div class="muted ${m.kind === "lens" ? "mono" : "sku"}" style="font-size:12px">${esc(detail)}</div></td>
-      <td><span class="tag">${label}</span></td>
+      ${compact ? "" : `<td><span class="tag">${label}</span></td>`}
       <td class="n ${cls}">${m.type === "adjust" ? "=" + m.qty : sign + m.qty}</td>
       ${compact ? "" : `<td class="muted">${esc(m.note || "")}</td>`}
     </tr>`;
